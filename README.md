@@ -35,40 +35,28 @@ puts [["'a'"]].to_relation(schema: { a: nil })
 #=> SELECT "a"::TEXT FROM (VALUES('''a''')) AS "_t"("a")
 ```
 
-### PostgreSQL
+### Usage for PostgreSQL
 
 ```ruby
 require 'relationize'
-
-class Hoge
-  using Relationize
-
-  def initialize(data, schema)
-    @data = data
-    @schema = schema
-  end
-
-  def to_sql
-    @data.to_relation(schema: @schema)
-  end
-end
-
 require 'pg'
 
-hoge = Hoge.new(
-  [[1, 2, 3], [4, 5, 6]],
-  {a: nil, b: nil, c: :decimal}
-)
+using Relationize
 
-p PG.connect.exec(hoge.to_sql).to_a
+sql = [
+  [1, 2, 3],
+  [4, 5, 6]
+].to_relation(schema: {a: nil, b: nil, c: :decimal})
+
+p PG.connect.exec(sql).to_a
 #=> [{"a"=>"1", "b"=>"2", "c"=>"3"}, {"a"=>"4", "b"=>"5", "c"=>"6"}]
 
 p PG.connect.exec(<<-SQL).to_a #=> [{"a"=>"1", "b"=>"2", "c"=>"3"}]
-SELECT * FROM (#{hoge.to_sql}) AS t WHERE "a" < 3
+SELECT * FROM (#{sql}) AS t WHERE "a" < 3
 SQL
 
 p PG.connect.exec(<<-SQL).to_a #=> [{"a"=>"4", "b"=>"5", "c"=>"6"}]
-  WITH t AS (#{hoge.to_sql})
+  WITH t AS (#{sql})
 SELECT * FROM t WHERE t."a" > 3
 SQL
 ```
