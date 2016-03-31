@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/yancya/relationize.svg?branch=master)](https://travis-ci.org/yancya/relationize)
+
 # Relationize
 
 This gem convert Array to String of SQL relation.
