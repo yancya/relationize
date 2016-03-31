@@ -1,3 +1,5 @@
+require 'hash/to_proc'
+
 module Relationize
   #
   # Relationizer Base Class 
@@ -35,7 +37,7 @@ module Relationize
         next type.to_s.upcase if type
 
         values.map(&:class).uniq.
-          map { |klass| self.class::DEFAULT_TYPES[klass] }.compact.uniq.
+          map(&self.class::DEFAULT_TYPES).compact.uniq.
           tap { |types| raise ReasonlessTypeError.new("Many candidate: #{types.join(', ')}") unless types.one? }.
           tap { |types| raise ReasonlessTypeError.new("Candidate nothing") if types.empty? }.
           first.to_s.upcase
